@@ -1,0 +1,42 @@
+\contentsline {chapter}{摘\hskip 1em\relax 要}{1}{chapter*.1}
+\contentsline {chapter}{ABSTRACT}{2}{chapter*.2}
+\contentsline {chapter}{\numberline {第一\ignorespaces 章\hspace {0.3em}}介绍}{1}{chapter.1}
+\contentsline {chapter}{\numberline {第二\ignorespaces 章\hspace {0.3em}}中文支持}{2}{chapter.2}
+\contentsline {chapter}{\numberline {第三\ignorespaces 章\hspace {0.3em}}选项}{3}{chapter.3}
+\contentsline {section}{\numberline {3.1}中文字库}{3}{section.3.1}
+\contentsline {section}{\numberline {3.2}排版风格}{3}{section.3.2}
+\contentsline {section}{\numberline {3.3}打印}{3}{section.3.3}
+\contentsline {section}{\numberline {3.4}默认选项}{3}{section.3.4}
+\contentsline {chapter}{\numberline {第四\ignorespaces 章\hspace {0.3em}}常用命令}{4}{chapter.4}
+\contentsline {section}{\numberline {4.1}字体}{4}{section.4.1}
+\contentsline {section}{\numberline {4.2}字号、字距、字宽和缩进}{4}{section.4.2}
+\contentsline {section}{\numberline {4.3}中文数字转换}{5}{section.4.3}
+\contentsline {section}{\numberline {4.4}数学环境}{5}{section.4.4}
+\contentsline {chapter}{\numberline {第五\ignorespaces 章\hspace {0.3em}}杂七杂八的话}{6}{chapter.5}
+\contentsline {section}{\numberline {5.1}模板的目录结构}{6}{section.5.1}
+\contentsline {section}{\numberline {5.2}引用}{6}{section.5.2}
+\contentsline {subsection}{\numberline {5.2.1}参考文献}{6}{subsection.5.2.1}
+\contentsline {subsection}{\numberline {5.2.2}对图表、章节、公式的引用}{6}{subsection.5.2.2}
+\contentsline {section}{\numberline {5.3}图形和表格}{7}{section.5.3}
+\contentsline {chapter}{\numberline {第六\ignorespaces 章\hspace {0.3em}}增强这个模板}{8}{chapter.6}
+\contentsline {chapter}{\numberline {附录\nobreakspace {}A\hspace {0.3em}}山东大学研究生院关于学位论文的格式要求}{9}{appendix.A}
+\contentsline {section}{\numberline {A.1}学位论文的基本要求}{9}{section.A.1}
+\contentsline {section}{\numberline {A.2}学位论文的结构要求}{9}{section.A.2}
+\contentsline {section}{\numberline {A.3}学位论文的格式要求}{9}{section.A.3}
+\contentsline {subsection}{\numberline {A.3.1}论文封面}{9}{subsection.A.3.1}
+\contentsline {subsection}{\numberline {A.3.2}扉页}{9}{subsection.A.3.2}
+\contentsline {subsection}{\numberline {A.3.3}原创性声明和关于学位论文使用授权的说明}{10}{subsection.A.3.3}
+\contentsline {subsection}{\numberline {A.3.4}论文目录}{10}{subsection.A.3.4}
+\contentsline {subsection}{\numberline {A.3.5}中文摘要}{10}{subsection.A.3.5}
+\contentsline {subsection}{\numberline {A.3.6}外文摘要}{10}{subsection.A.3.6}
+\contentsline {subsection}{\numberline {A.3.7}符号说明}{10}{subsection.A.3.7}
+\contentsline {subsection}{\numberline {A.3.8}论文正文}{10}{subsection.A.3.8}
+\contentsline {subsection}{\numberline {A.3.9}附录、附图表}{11}{subsection.A.3.9}
+\contentsline {subsection}{\numberline {A.3.10}引文出处及参考文献}{11}{subsection.A.3.10}
+\contentsline {subsection}{\numberline {A.3.11}致谢}{11}{subsection.A.3.11}
+\contentsline {subsection}{\numberline {A.3.12}攻读学位期间发表的学术论文目录}{11}{subsection.A.3.12}
+\contentsline {subsection}{\numberline {A.3.13}学位论文评阅及答辩情况}{11}{subsection.A.3.13}
+\contentsline {subsection}{\numberline {A.3.14}外文论文}{11}{subsection.A.3.14}
+\contentsline {subsubsection}{外文论文写作的形式}{11}{section*.4}
+\contentsline {subsubsection}{外语写作的要求}{11}{section*.5}
+\contentsline {section}{\numberline {A.4}学位论文的打印与装订}{12}{section.A.4}

@@ -1,0 +1,66 @@
+\newtoks\fenlei		% 中图分类号
+\newtoks\DWdaihao	% 单位代号
+\newtoks\miji		% 密级
+\newtoks\StuNum		% 学号
+\newtoks\Ctitle		% 中文标题
+\newtoks\Cauthor	% 作者中文名
+\newtoks\Cmajor		% 专业
+\newtoks\Csuperver	% 导师
+\newtoks\Cdate		% 中文日期
+\newtoks\Dpart		% 学院
+\newtoks\Grade		% 年级
+\newtoks\gradeTime	% 毕业时间
+
+\RequirePackage{makecell}
+\newcommand{\LeftLength}{2.3cm}
+\newcommand{\RightLength}{5.5cm}
+\newcommand{\Mcs}[1]{\makebox[\LeftLength][s]{{\zihao{3}\bfseries\kaishu{}#1}}}
+\newcommand{\Mcc}[1]{\makebox[\RightLength][c]{{\zihao{-3}\songti{}#1}}}
+\newcommand{\maketitlepage}{%
+\begin{titlepage}
+\begin{center}
+~
+\vskip 8mm\relax
+{
+	\begin{minipage}[c]{2.64cm}
+	\centering
+	\resizebox{!}{0.9cm}{%
+	\parbox{0.54cm}{\includegraphics[width=33mm]{npuBlack.pdf}}
+	}
+	\end{minipage}
+	\hskip 0.8cm
+	\begin{minipage}[c]{8cm}
+	{\fontsize{33}{33}\nwpulogo{}西北工业大学}
+	\end{minipage}
+	\vskip 0.7cm
+	{
+		\zihao{0}\songti {\bfseries 本科毕业设计论文}
+	}
+}
+\par \vskip 50mm \relax
+{
+	\begin{flushleft}
+		{\zihao{3}\heiti{}论文（设计）题目：}
+	\end{flushleft}
+}
+\vfill
+{
+	\noindent
+	\zihao{-1}\kaishu\the\Ctitle
+}
+\vfill
+{
+	\begin{tabular}{p{\LeftLength}p{\RightLength}}
+	\Mcs{专业名称}& \Mcc{\the\Cmajor}\\[-.8mm]\cline{2-2}\\[5mm]
+	\Mcs{学生姓名}& \Mcc{\the\Cauthor}\\[-.8mm]\cline{2-2}\\[5mm]
+	\Mcs{指导教师}& \Mcc{\the\Csuperver}\\[-.8mm]\cline{2-2}\\[5mm]
+	\Mcs{毕业时间}& \Mcc{\the\gradeTime}\\[-.8mm]\cline{2-2}
+	\end{tabular}
+}
+\par \vskip 20mm \relax
+{
+\zihao{3}\the\Cdate
+}
+\end{center}
+\end{titlepage}
+}
