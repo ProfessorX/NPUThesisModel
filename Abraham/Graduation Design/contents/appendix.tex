@@ -1,0 +1,539 @@
+﻿\chapter{源代码}
+部分源代码重合程度较高，在此只列出核心的几个程序作为范例。
+\section{AffineProjection.m}
+\begin{lstlisting}
+function    [outputVector,...
+             errorVector,...
+             coefficientVector] =   Affine_projection(desired,input,S)
+
+%   Affine_projection.m
+%   Implements the Complex Affine-Projection algorithm for COMPLEX valued data.
+%
+%   Syntax:
+%       [outputVector,errorVector,coefficientVector] = Affine_projection(desired,input,S)
+%
+%   Input Arguments:
+%       . desired   : Desired signal.                               (ROW vector)
+%       . input     : Signal fed into the adaptive filter.          (ROW vector)
+%       . S         : Structure with the following fields
+%           - step                  : Convergence (relaxation) factor.
+%           - filterOrderNo         : Order of the FIR filter.
+%           - initialCoefficients   : Initial filter coefficients.  (COLUMN vector)
+%           - gamma                 : Regularization factor.
+%                                     (small positive constant to avoid singularity)
+%           - memoryLength          : Reuse data factor.
+%                                     (referred as L in the textbook)
+%
+%   Output Arguments:
+%       . outputVector      :   Store the estimated output of each iteration.   (COLUMN vector)
+%       . errorVector       :   Store the error for each iteration.             (COLUMN vector)
+%       . coefficientVector :   Store the estimated coefficients for each iteration.
+%                               (Coefficients at one iteration are COLUMN vector)
+%
+
+%   Some Variables and Definitions:
+%       . prefixedInput         :   Input is prefixed by nCoefficients -1 zeros.
+%                                   (The prefix led to a more regular source code)
+%
+%       . regressor             :   Auxiliar variable. Store the piece of the
+%                                   prefixedInput that will be multiplied by the
+%                                   current set of coefficients.
+%                                   (regressor is a COLUMN vector)
+%
+%       . nCoefficients         :   FIR filter number of coefficients.
+%
+%       . nIterations           :   Number of iterations.
+
+
+%   Initialization Procedure
+nCoefficients       =   S.filterOrderNo+1;
+nIterations         =   length(desired);
+
+%   Pre Allocations
+errorVectorApConj       =   zeros((S.memoryLength+1)
+,nIterations);
+outputVectorApConj      =   zeros((S.memoryLength+1)
+,nIterations);
+coefficientVector       =   zeros(nCoefficients
+,(nIterations+1));
+regressor               =   zeros(nCoefficients
+,(S.memoryLength+1));
+
+%   Initial State Weight Vector
+coefficientVector(:,1)  =   S.initialCoefficients;
+
+%   Improve source code regularity
+prefixedInput           =   [zeros((nCoefficients-1),1)
+                             transpose(input)];
+prefixedDesired         =   [zeros(S.memoryLength,1)
+                             transpose(desired)];
+
+%   Body
+for it = 1:nIterations,
+
+    regressor(:,2:S.memoryLength+1) =   regressor(:,1:S.memoryLength);
+
+    regressor(:,1)                  =
+    prefixedInput(it+(nCoefficients-1):-1:it);
+
+    outputVectorApConj(:,it)        =
+    (regressor')*coefficientVector(:,it);
+
+    errorVectorApConj(:,it)         =
+    conj(prefixedDesired(it+(S.memoryLength):-1:it))...
+    -outputVectorApConj(:,it);
+
+    coefficientVector(:,it+1)       =
+    coefficientVector(:,it)+(S.step*regressor*...
+    inv(regressor'*regressor+S.gamma*...
+    eye(S.memoryLength+1))*errorVectorApConj(:,it));
+
+end
+
+outputVector            =   outputVectorApConj(1,:)';
+errorVector             =   errorVectorApConj(1,:)';
+
+%   EOF
+\end{lstlisting}
+
+\section{AffineProjectionExample.m}
+\begin{lstlisting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                        Example: System Identification                         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                               %
+%  In this example we have a typical system identification scenario. We want    %
+% to estimate the filter coefficients of an unknown system given by Wo. In      %
+% order to accomplish this task we use an adaptive filter with the same         %
+% number of coefficients, N, as the unkown system. The procedure is:            %
+% 1)  Excitate both filters (the unknown and the adaptive) with the signal      %
+%   x. In this case, x is chosen according to the 4-QAM constellation.          %
+%   The variance of x is normalized to 1.                                       %
+% 2)  Generate the desired signal, d = Wo' x + n, which is the output of the    %
+%   unknown system considering some disturbance (noise) in the model. The       %
+%   noise power is given by sigma_n2.                                           %
+% 3)  Choose an adaptive filtering algorithm to govern the rules of coefficient %
+%   updating.                                                                   %
+%                                                                               %
+%     Adaptive Algorithm used here: Affine Projection                           %
+%                                                                               %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%   Definitions:
+ensemble    = 100;                          % number of realizations within the ensemble
+K           = 500;                          % number of iterations
+H           = [0.32+0.21*j,-0.3+0.7*j,0.5-0.8*j,0.2+0.5*j].';
+Wo          = H;                            % unknown system
+sigma_n2    = 0.04;                         % noise power
+N           = 4;                            % number of coefficients of the adaptive filter
+mu          = .1;                           % convergence factor (step)  (0 < mu < 1)
+gamma       = 1e-12;                        % small positive constant to avoid singularity
+L           = 1;                            % data reuse factor (L=0 -> NLMS; L=1 -> BNLMS; ...)
+
+
+%   Initializing & Allocating memory:
+W       = ones(N,(K+1),ensemble);   % coefficient vector for each iteration and realization; w(0) = [1 1 1 1].'
+MSE     = zeros(K,ensemble);        % MSE for each realization
+MSEmin  = zeros(K,ensemble);        % MSE_min for each realization
+
+
+%   Computing:
+for l=1:ensemble,
+
+    X       = zeros(N,1);               % input at a certain iteration (tapped delay line)
+    d       = zeros(1,K);               % desired signal
+
+    x        = (sign(randn(K,1)) + j*sign(randn(K,1)))./sqrt(2); % Creating the input signal (normalized)
+    sigma_x2 = var(x);                                           % signal power = 1
+    n        = sqrt(sigma_n2/2)*(randn(K,1)+j*randn(K,1));       % complex noise
+
+    for k=1:K,
+
+        X       =   [x(k,1)
+                     X(1:(N-1),1)];              % input signal (tapped delay line)
+
+        d(k)    =   (Wo'*X(:,1))+n(k);           % desired signal
+
+    end
+
+    S   =   struct('step',mu,'filterOrderNo',(N-1),'initialCoefficients',...
+                   W(:,1,l),'gamma',gamma,'memoryLength',L);
+    [y,e,W(:,:,l)]  =   Affine_projection(d,transpose(x),S);
+
+    MSE(:,l)    =   MSE(:,l)+(abs(e(:,1))).^2;
+    MSEmin(:,l) =   MSEmin(:,l)+(abs(n(:))).^2;
+
+end
+
+
+%   Averaging:
+W_av = sum(W,3)/ensemble;
+MSE_av = sum(MSE,2)/ensemble;
+MSEmin_av = sum(MSEmin,2)/ensemble;
+
+
+%   Plotting:
+figure,
+plot(1:K,10*log10(MSE_av),'-k');
+title('Learning Curve for MSE');
+xlabel('Number of iterations, k'); ylabel('MSE [dB]');
+
+figure,
+plot(1:K,10*log10(MSEmin_av),'-k');
+title('Learning Curve for MSEmin');
+xlabel('Number of iterations, k'); ylabel('MSEmin [dB]');
+
+figure,
+subplot 211, plot(real(W_av(1,:))),...
+title('Evolution of the 1st coefficient (real part)');
+xlabel('Number of iterations, k'); ylabel('Coefficient');
+subplot 212, plot(imag(W_av(1,:))),...
+title('Evolution of the 1st coefficient (imaginary part)');
+xlabel('Number of iterations, k'); ylabel('Coefficient');
+\end{lstlisting}
+
+\section{AffineProjectionLearningCurve.m}
+\begin{lstlisting}
+
+%%% APA Algorithm for System Identification
+
+
+% % %% number of runs, iterations...
+% % num_runs=200;  num_iter=500;
+% %
+% %
+% % %% Input type
+% % GAUSSIAN_WHITE   = 1;
+% % GAUSSIAN_COLORED = 2;
+% % UNIFORM_WHITE    = 3;
+% % UNIFORM_COLORED  = 4;
+% % input_type = GAUSSIAN_WHITE; %UNIFORM_WHITE;
+% %
+% %
+% % %% APA parameters
+% % M = 16;    % input vector length
+% % K = 4;     % number of past regressors, observ. to use
+% % D = 8;     % delay between past regressors, observ. used
+% % mu = 1.0;  % update gain parameter
+
+
+%% Plant parameters
+%v_var = 0.001;             % measurement noise (for 30dB)
+epsil_I = 0;%0.001*eye(K);    % regularization parameter
+
+% randomly generate optimum weights
+w_opt = rand(M, 1);
+
+%% For input signal statistics...
+E_r2 = 0;
+R = zeros(M,M);
+
+%% For numerous runs of plant...
+START_DLY = M + K*D;
+wgt_vec = zeros(M,1);
+mse_vec = zeros(num_iter,1);
+for run_cnt = 1:num_runs
+
+    %% Generate plant signal (before noise)
+    if input_type == GAUSSIAN_WHITE
+        u_i = randn(1, num_iter+START_DLY);         % gaussian, unit variance
+    elseif input_type == UNIFORM_WHITE
+        u_i = 2*rand(1, num_iter+START_DLY,1) - 1;  % uniform, between -1, +1
+    elseif input_type == GAUSSIAN_COLORED
+        u_i = randn(1, num_iter+START_DLY);         % gaussian, unit variance
+        u_i = filter(1, [1 -0.9], u_i);             % pole at 0.9
+    else % UNIFORM_COLORED
+        u_i = 2*rand(1, num_iter+START_DLY,1) - 1;  % uniform, between -1, +1
+        u_i = filter(1, [1 -0.9], u_i);             % pole at 0.9
+%       u_i = filter(1, [1 -0.5], u_i);             % pole at 0.5
+    end
+    y_i = filter(w_opt, 1, u_i);                    % noiseless plant output
+
+
+    % Find autocorr. R, E[1/r^2], for input signal, u_i
+    for i = START_DLY : (num_iter+START_DLY-1)
+        u_vec = u_i(i:-1:i-M+1).';
+        R = R + (u_vec * u_vec') / num_iter;
+        E_r2 = E_r2 + (1/(norm(u_vec)^2)) / num_iter;
+    end
+
+
+    %% Add measurement noise to plant output
+    scale_y = 1 / sqrt(mean(y_i.*conj(y_i)));
+    y_i = y_i * scale_y;                             % normalize plant power (x4)
+    v_i = sqrt(v_var)*randn(1, num_iter+START_DLY);  % noise for 30dB SNR
+    d_i = y_i + v_i;                                 % add noise to output
+
+    %% Initialize APA
+    w = zeros(M, 1);           % init. weights
+    U_i = zeros(K, M);
+    D_i = zeros(K, 1);
+
+    %% APA algorithm computation
+    for i = START_DLY : (num_iter+START_DLY-1)
+        % APA inputs (U_i and D_i)
+        for k = 0 : (K-1);
+            i_a = i - k*D;
+            i_b = i - k*D - M+1;
+            U_i(k+1,:) = u_i(i_a : -1 : i_b);
+            D_i(k+1,:) = d_i(i_a);
+        end
+
+        % Apply APA algorithm
+        Y_apa = U_i*w;
+        e_i = D_i - Y_apa;
+        w_p = w;
+        w = w + mu*U_i'*inv(epsil_I + U_i*U_i')*e_i;
+
+        % Store MSE output
+        mse_vec(i-START_DLY+1) = mse_vec(i-START_DLY+1) + e_i(1).*conj(e_i(1));
+
+    end
+
+    %% Add final weights to average
+    wgt_vec = wgt_vec + w;
+end
+
+
+%% Average MSE error, final weight  vector
+mse_vec = mse_vec / num_runs;
+wgt_vec = wgt_vec / num_runs;
+
+% various parameters (R, E[1/r^2], etc...)
+E_r2 = E_r2 / num_runs;
+R = R / num_runs;
+tr_R = trace(R);
+[U,S,V] = svd(R);
+p_v = diag(S)/tr_R;
+%  p_v = ones(size(p_v))*(1/M);
+
+% % %% Plot learning curves
+% % figure; plot(0:num_iter-1, 10*log10(mse_vec));
+% % title('APA MSE (Ensemble-averaged, 20 Runs, 1000 Iter.)');
+% % xlabel('Iteration, n'); ylabel('Mean-Square-Error, J(n)');
+% % axis([-10 510 -30 0]); grid on;
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+format long;
+
+% Display simulation MSE results
+K__D__mu =[K D mu]
+msevec_sim = mse_vec(end-3:end).'                                   ;
+msevec_avg = mean(mse_vec(end-floor(num_iter*0.2):end))             ;
+E_r2
+
+% Compute component for correl. of noise, coeff.
+G = 0;
+for i = 1:M
+    for g = 1 : (K-1)
+        G = G + p_v(i) * ( 1 - (1-(1-p_v(i))^g)/(1-(1-p_v(i))^K) ) * (1-mu)^g;
+    end
+end
+
+% Compute theoretical MSE
+mse_theory_a = v_var + (mu*v_var)/(2-mu)*E_r2*tr_R                              ;
+mse_theory_b = v_var + (mu*v_var)/(2-mu)*E_r2*tr_R*(1+2*G)                      ;
+mse_theory_diniz = v_var + K*(mu*v_var)/(2-mu)*(1-(1-mu)^2)/(1-(1-mu)^(2*K))    ;
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% Theoretical MSE curve
+a = mu*(2-mu);
+lmb_ni_orig = zeros(M,num_iter);
+lmb_ni_mod  = zeros(M,num_iter);
+lmb_ni_orig(:,1) = diag(V'*w_opt*w_opt'*V)*scale_y^2;  % transformed (based on Rxx)
+lmb_ni_mod(:,1)  = diag(V'*w_opt*w_opt'*V)*scale_y^2;  % transformed (based on Rxx)
+mse_vec_theory_orig = zeros(num_iter,1);
+mse_vec_theory_mod  = zeros(num_iter,1);
+
+for n = 2 : num_iter
+    % find transformed covariance matrix
+    for i = 1:M
+
+        % beta term
+        b = 1-(1-p_v(i))^K;
+
+        % original formula...
+        lmb_ni_orig(i,n) = (1 - a*b)*lmb_ni_orig(i,(n-1)) + mu^2*v_var*E_r2*b;
+
+        % modified formula...
+        G_i = 0;
+        for g = 1 : (K-1)
+            G_i = G_i + ( (1-p_v(i))^g - (1-p_v(i))^K ) * (1-mu)^g;
+        end
+        lmb_ni_mod(i,n)  = (1 - a*b)*lmb_ni_mod(i,(n-1)) + mu^2*v_var*E_r2*(b+2*G_i);
+    end
+    % compute theoretical MSE curves
+    mse_vec_theory_orig(n) = v_var + tr_R*sum(p_v.*lmb_ni_orig(:,n));     % assumes Rxx = I
+    mse_vec_theory_mod(n)  = v_var + tr_R*sum(p_v.*lmb_ni_mod(:,n));      % assumes Rxx = I
+end
+
+% Display results
+msevec_theory_orig = mse_vec_theory_orig(end-3:end).'               ;
+msevec_theory_mod  = mse_vec_theory_mod(end-3:end).'                ;
+
+%pause
+
+format short;
+
+\end{lstlisting}
+
+
+
+\section{AffineProjectionSteadyState.m}
+\begin{lstlisting}
+
+%%% APA Algorithm for System Identification
+
+
+% % %% number of runs, iterations...
+% % num_runs=200;  num_iter=500;
+% %
+% %
+% % %% Input type
+% % GAUSSIAN_WHITE   = 1;
+% % GAUSSIAN_COLORED = 2;
+% % UNIFORM_WHITE    = 3;
+% % UNIFORM_COLORED  = 4;
+% % input_type = GAUSSIAN_WHITE; %UNIFORM_WHITE;
+% %
+% %
+% % %% APA parameters
+% % M = 16;    % input vector length
+% % K = 4;     % number of past regressors, observ. to use
+% % D = 8;     % delay between past regressors, observ. used
+% % mu = 1.0;  % update gain parameter
+
+
+%% Plant parameters
+%v_var = 0.001;             % measurement noise (for 30dB)
+epsil_I = 0;%0.001*eye(K);    % regularization parameter
+
+% randomly generate optimum weights
+w_opt = rand(M, 1);
+
+%% For input signal statistics...
+E_r2 = 0;
+R = zeros(M,M);
+
+%% For numerous runs of plant...
+START_DLY = M + K*D;
+wgt_vec = zeros(M,1);
+mse_vec = zeros(num_iter,1);
+for run_cnt = 1:num_runs
+
+    %% Generate plant signal (before noise)
+    if input_type == GAUSSIAN_WHITE
+        u_i = randn(1, num_iter+START_DLY);         % gaussian, unit variance
+    elseif input_type == UNIFORM_WHITE
+        u_i = 2*rand(1, num_iter+START_DLY,1) - 1;  % uniform, between -1, +1
+    elseif input_type == GAUSSIAN_COLORED
+        u_i = randn(1, num_iter+START_DLY);         % gaussian, unit variance
+%       u_i = filter(1, [1 -0.9], u_i);             % pole at 0.9
+        u_i = filter(1, [1 -0.5], u_i);             % pole at 0.5
+    else % UNIFORM_COLORED
+        u_i = 2*rand(1, num_iter+START_DLY,1) - 1;  % uniform, between -1, +1
+        u_i = filter(1, [1 -0.9], u_i);             % pole at 0.9
+%       u_i = filter(1, [1 -0.5], u_i);             % pole at 0.5
+    end
+    y_i = filter(w_opt, 1, u_i);                    % noiseless plant output
+
+
+    % Find autocorr. R, E[1/r^2], for input signal, u_i
+    for i = START_DLY : (num_iter+START_DLY-1)
+        u_vec = u_i(i:-1:i-M+1).';
+        R = R + (u_vec * u_vec') / num_iter;
+        E_r2 = E_r2 + (1/(norm(u_vec)^2)) / num_iter;
+    end
+
+
+    %% Add measurement noise to plant output
+    scale_y = 1 / sqrt(mean(y_i.*conj(y_i)));
+    y_i = y_i * scale_y;                             % normalize plant power (x4)
+    v_i = sqrt(v_var)*randn(1, num_iter+START_DLY);  % noise for 30dB SNR
+    d_i = y_i + v_i;                                 % add noise to output
+
+    %% Initialize APA
+    w = zeros(M, 1);           % init. weights
+    U_i = zeros(K, M);
+    D_i = zeros(K, 1);
+
+    %% APA algorithm computation
+    for i = START_DLY : (num_iter+START_DLY-1)
+        % APA inputs (U_i and D_i)
+        for k = 0 : (K-1);
+            i_a = i - k*D;
+            i_b = i - k*D - M+1;
+            U_i(k+1,:) = u_i(i_a : -1 : i_b);
+            D_i(k+1,:) = d_i(i_a);
+        end
+
+        % Apply APA algorithm
+        Y_apa = U_i*w;
+        e_i = D_i - Y_apa;
+        w_p = w;
+        w = w + mu*U_i'*inv(epsil_I + U_i*U_i')*e_i;
+
+        % Store MSE output
+        mse_vec(i-START_DLY+1) = mse_vec(i-START_DLY+1) + e_i(1).*conj(e_i(1));
+
+    end
+
+    %% Add final weights to average
+    wgt_vec = wgt_vec + w;
+end
+
+
+%% Average MSE error, final weight  vector
+mse_vec = mse_vec / num_runs;
+wgt_vec = wgt_vec / num_runs;
+
+% various parameters (R, E[1/r^2], etc...)
+E_r2 = E_r2 / num_runs;
+R = R / num_runs;
+tr_R = trace(R);
+[U,S,V] = svd(R);
+p_v = diag(S)/tr_R;
+%  p_v = ones(size(p_v))*(1/M);
+
+% % %% Plot learning curves
+% % figure; plot(0:num_iter-1, 10*log10(mse_vec));
+% % title('APA MSE (Ensemble-averaged, 20 Runs, 1000 Iter.)');
+% % xlabel('Iteration, n'); ylabel('Mean-Square-Error, J(n)');
+% % axis([-10 510 -30 0]); grid on;
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+format long;
+
+% Display simulation MSE results
+K__D__mu =[K D mu]
+msevec_sim = mse_vec(end-3:end).'		;
+msevec_avg = mean(mse_vec(end-999:end))		;
+E_r2
+%p_v
+R
+
+% Compute component for correl. of noise, coeff.
+G = 0;
+for i = 1:M
+    for g = 1 : (K-1)
+        G = G + p_v(i) * (1-(1-p_v(i))^g)/(1-(1-p_v(i))^K) * (1-p_v(i))^(K-g) * (1-mu)^(K-g);
+%%        G = G + p_v(i) * (1-(1-p_v(i))^g)/(1-(1-p_v(i))^K) * (1-mu)^(K-g);
+    end
+end
+
+% Compute theoretical MSE
+mse_theory_orig_8 = v_var + (mu*v_var)/(2-mu)*E_r2*tr_R				;
+mse_theory_mod_23  = v_var + (mu*v_var)/(2-mu)*E_r2*tr_R*(1+2*G)		;
+mse_theory_shin_23 = v_var + K*(mu*v_var)/(2-mu)*E_r2*tr_R			;
+mse_theory_diniz = v_var + K*(mu*v_var)/(2-mu)*(1-(1-mu)^2)/(1-(1-mu)^(2*K))	;
+
+format short;
+
+\end{lstlisting}
+

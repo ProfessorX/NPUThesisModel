@@ -1,0 +1,75 @@
+\begin{thebibliography}{10}
+
+\bibitem{ENIAC}
+Wikipedia.
+\newblock Eniac.
+\newblock Technical report, http://en.wikipedia.org/wiki/ENIAC, 2013.
+
+\bibitem{Tranter1994}
+W.~H. Tranter and K.~L. Kosbar.
+\newblock Simulation of communication systems.
+\newblock {\em IEEE Communications Magazine}, pages 26--35, July 1994.
+
+\bibitem{Rabaey2013}
+J.~M. Rabaey.
+\newblock The spice homepage.
+\newblock Technical report, Department of Electrical Engineering and Computer
+  Science, 2013.
+
+\bibitem{Jeruchim2000}
+M.~C. Jeruchim, P.~Balaban, and K.~S. Shanmugan.
+\newblock {\em Simulation of Communication Systems}.
+\newblock Springer, 2nd edition, October 2000.
+
+\bibitem{MATLAB}
+MathWorks.
+\newblock Matlab-the language of technical computing.
+\newblock Technical report, MathWorks, 2013.
+
+\bibitem{Ozeki1984}
+K.~Ozeki and T.~Umeda.
+\newblock An adaptive filtering algorithm using an orthogonal projection to an
+  affine subspace and its properities.
+\newblock {\em Electronics and Communications in Japan}, 67-A(5):19--36, 1984.
+
+\bibitem{Ziemer1998}
+R.~E. Ziemer, W.~H Tranter, and D.~R. Fannin.
+\newblock {\em Signals and Systems: Continuous and Discrete}.
+\newblock Prentice Hall, 4th edition, Febuary 1998.
+
+\bibitem{Oppenheim2009}
+A.~V. Oppenheim and R.~W. Schafer.
+\newblock {\em Discrete-Time Signal Processing}.
+\newblock Prentice Hall, 3rd edition, August 2009.
+
+\bibitem{Oppenheim1996}
+A.~V. Oppenheim, A.~S. Willsky, and S.~Hamid.
+\newblock {\em Signals and Systems}.
+\newblock Prentice Hall, 2nd edition, August 1996.
+
+\bibitem{Haykin2002}
+S.~Haykin.
+\newblock {\em Adaptive Filter Theory}.
+\newblock Pearson Education, Communications Research Laborotary, McMaster
+  University, 4th edition, 2002.
+
+\bibitem{Sankaran2000}
+S.~G. Sankaran and A.A. Beex.
+\newblock Convergence behavior of affine projection.
+\newblock {\em IEEE Transactions on Signal Processing}, 48(4):1086--1095, April
+  2000.
+
+\bibitem{Sankaran2000A}
+S.G.Sankaran and A.A.~(Louis) Beex.
+\newblock Fast generalized affine projection algorithm.
+\newblock {\em International Journal of Adaptive Control and Signal
+  Processing}, pages 623--641, 2000.
+
+\bibitem{Paul2011}
+T.~K. Paul and T.~Ogunfunmi.
+\newblock On the convergence behavior of the affine projection algorithm for
+  adaptive filters.
+\newblock {\em IEEE Transactions on Circuits and Systems}, 58(8):1813--1826,
+  August 2011.
+
+\end{thebibliography}
