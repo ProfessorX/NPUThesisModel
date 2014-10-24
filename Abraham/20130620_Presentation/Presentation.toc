@@ -1,0 +1,19 @@
+\beamer@endinputifotherversion {3.26pt}
+\beamer@sectionintoc {1}{Introduction}{2}{0}{1}
+\beamer@subsectionintoc {1}{1}{Outline}{2}{0}{1}
+\beamer@subsectionintoc {1}{2}{Applications}{3}{0}{1}
+\beamer@sectionintoc {2}{Development}{5}{0}{2}
+\beamer@subsectionintoc {2}{1}{Performance Functions}{5}{0}{2}
+\beamer@subsectionintoc {2}{2}{Performance (Cost) Functions - continued}{6}{0}{2}
+\beamer@subsectionintoc {2}{3}{Affine Projection Algorithm}{7}{0}{2}
+\beamer@subsectionintoc {2}{4}{Adaptive Filtering Applications}{9}{0}{2}
+\beamer@sectionintoc {3}{Result}{12}{0}{3}
+\beamer@subsectionintoc {3}{1}{MATLAB Codes}{12}{0}{3}
+\beamer@subsectionintoc {3}{2}{Simulation Results}{14}{0}{3}
+\beamer@sectionintoc {4}{Further Work}{16}{0}{4}
+\beamer@subsectionintoc {4}{1}{Weight Error Update Equations}{16}{0}{4}
+\beamer@subsectionintoc {4}{2}{Deal with Computational Complexity}{21}{0}{4}
+\beamer@subsectionintoc {4}{3}{Instability \& Memory}{22}{0}{4}
+\beamer@subsectionintoc {4}{4}{Workload}{24}{0}{4}
+\beamer@sectionintoc {5}{Question \& Answer}{25}{0}{5}
+\beamer@subsectionintoc {5}{1}{Open for Any Questions}{25}{0}{5}

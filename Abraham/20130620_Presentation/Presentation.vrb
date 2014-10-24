@@ -1,0 +1,27 @@
+\frametitle{Computational Complexity}
+\begin{itemize}
+  \item Adaptive filter with $N$ real coefficients and real signals
+  \item For the AP algorithm, $K~=~P+1$
+\end{itemize}
+\begin{tabular}{|c|c|c|c|}
+
+  \hline
+  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+  Algorithm & $\times$ & $+$ & $/$ \\
+  LMS & $2N+1$ & $2N$ &  \\
+  NLMS & $3N+1$ & $3N$ & $1$ \\
+  AP & $(K^{2}+2K)N+K^{3}+K$ & $(K^{2}+2K)N+K^{3}+K$ &  \\
+  RLS & $N^{2}+5N+1$ & $N^{2}+3N$ & $1$ \\
+  \hline
+\end{tabular}
+For $N~=~100,P~=~2$
+\begin{tabular}{|c|c|c|c|c|}
+  \hline
+  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+  Algorithm & $\times$ & $+$ & $/$ & $\simeq$factor \\
+  LMS & 201 & 200 &  & 1 \\
+  NLMS & 301 & 300 & 1 & 1.5 \\
+  AP & 1,530 & 1,536 &  & 7.5 \\
+  RLS & 10,501 & 10,300 & 1 & 52.5 \\
+  \hline
+\end{tabular}

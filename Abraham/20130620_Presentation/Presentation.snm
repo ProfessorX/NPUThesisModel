@@ -1,0 +1,15 @@
+\beamer@slide {equ:RegMSE}{5}
+\beamer@slide {equ:Lnorm}{5}
+\beamer@slide {equ:LeastMF}{6}
+\beamer@slide {equ:LeastMMN}{6}
+\beamer@slide {equ:ConstantM}{6}
+\beamer@slide {equ:ErrorV}{8}
+\beamer@slide {equ:ProjectionOntoSubspace}{8}
+\beamer@slide {equ:AffineProjectionAlgo}{8}
+\beamer@slide {equ:SteepestDA}{16}
+\beamer@slide {equ:NetwonA}{16}
+\beamer@slide {euq:LeastMeanSquare}{16}
+\beamer@slide {equ:NormalizedLeastMeanSquare}{17}
+\beamer@slide {equ:AffineProjectionAlgorithm}{17}
+\beamer@slide {equ:RecursiveLeastSquare}{17}
+\beamer@slide {equ:RecursiveWeightUpdate}{18}
